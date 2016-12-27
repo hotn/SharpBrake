@@ -251,40 +251,41 @@ namespace SharpBrake
                 // Airbrake requires that at least one line is present in the XML.
                 AirbrakeTraceLine line = new AirbrakeTraceLine("none", 0);
                 lines.Add(line);
-                return lines.ToArray();
             }
-
-            foreach (StackFrame frame in frames)
+            else
             {
-                MethodBase method = frame.GetMethod();
-
-                catchingMethod = method;
-
-                int lineNumber = frame.GetFileLineNumber();
-
-                if (lineNumber == 0)
+                foreach (StackFrame frame in frames)
                 {
-                    this.log.Debug(f => f("No line number found in {0}, using IL offset instead.", method));
-                    lineNumber = frame.GetILOffset();
+                    MethodBase method = frame.GetMethod();
+
+                    catchingMethod = method;
+
+                    int lineNumber = frame.GetFileLineNumber();
+
+                    if (lineNumber == 0)
+                    {
+                        this.log.Debug(f => f("No line number found in {0}, using IL offset instead.", method));
+                        lineNumber = frame.GetILOffset();
+                    }
+
+                    string file = frame.GetFileName();
+
+                    if (String.IsNullOrEmpty(file))
+                    {
+                        // ReSharper disable ConditionIsAlwaysTrueOrFalse
+                        file = method.ReflectedType != null
+                                   ? method.ReflectedType.FullName
+                                   : "(unknown)";
+                        // ReSharper restore ConditionIsAlwaysTrueOrFalse
+                    }
+
+                    AirbrakeTraceLine line = new AirbrakeTraceLine(file, lineNumber)
+                    {
+                        Method = method.Name
+                    };
+
+                    lines.Add(line);
                 }
-
-                string file = frame.GetFileName();
-
-                if (String.IsNullOrEmpty(file))
-                {
-                    // ReSharper disable ConditionIsAlwaysTrueOrFalse
-                    file = method.ReflectedType != null
-                               ? method.ReflectedType.FullName
-                               : "(unknown)";
-                    // ReSharper restore ConditionIsAlwaysTrueOrFalse
-                }
-
-                AirbrakeTraceLine line = new AirbrakeTraceLine(file, lineNumber)
-                {
-                    Method = method.Name
-                };
-
-                lines.Add(line);
             }
 
             if (Configuration.LogInnerExceptions)
