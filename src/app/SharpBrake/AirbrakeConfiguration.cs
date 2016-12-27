@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Web;
+using SharpBrake.Serialization;
 
 namespace SharpBrake
 {
@@ -75,5 +77,11 @@ namespace SharpBrake
         /// If set to true, all inner exceptions will be logged. Default is false.
         /// </summary>
         public bool LogInnerExceptions { get; set; }
+
+        /// <summary>
+        /// Gets or sets custom parameters.
+        /// </summary>
+        /// <value>Custom parameters.</value>
+        public List<AirbrakeVar> Params { get; set; }
     }
 }

@@ -126,6 +126,7 @@ namespace SharpBrake
                 Error = error,
                 Notifier = Notifier,
                 ServerEnvironment = ServerEnvironment,
+                Params = Configuration.Params
             };
 
             MethodBase catchingMethod = (error != null)
@@ -191,6 +192,11 @@ namespace SharpBrake
             var parameters = new List<AirbrakeVar>();
             var session = new List<AirbrakeVar>();
             var httpContext = HttpContext.Current;
+
+            if (notice.Params != null)
+            {
+                parameters.AddRange(notice.Params);
+            }
 
             if (httpContext != null)
             {
